@@ -1,13 +1,9 @@
 //React
-import React, { useState, useEffect } from "react";
+import React from "react";
 //MUI components
 import { TextField, Grid, Box, Button, Card } from "@material-ui/core";
-//Database api
-import Axios from "axios";
 //Logic components
 import useDataBase from "./useDataBase";
-
-
 
 const data = [
 	{
@@ -22,73 +18,7 @@ const data = [
 ];
 
 export default function Main() {
-	const [name, setName] = useState("");
-	const [email, setEmail] = useState("");
-	const [user, setUser] = useState("");
-	const [newUser, setNewUser] = useState("");
-	const [userList, setUserList] = useState([]);
-
-	const setData = (e) => {
-		if (e.target.name == "Name") setName(e.target.value);
-		else if (e.target.name == "Email") setEmail(e.target.value);
-		else if (e.target.name == "User") setUser(e.target.value);
-	};
-
-	const addUsers = () => {
-		Axios.post("http://localhost:3001/create", {
-			name: name,
-			email: email,
-			user: user,
-		}).then(() => {
-			setUserList([
-				...userList,
-				{
-					name: name,
-					email: email,
-					user: user,
-				},
-			]);
-		});
-	};
-
-	const getUsers = () => {
-		Axios.get("http://localhost:3001/users").then((response) => {
-			setUserList(response.data);
-		});
-	};
-
-	useEffect(() => {
-		getUsers();
-	});
-
-	const updateUser = (id) => {
-		Axios.put("http://localhost:3001/update", { user: newUser, id: id }).then(
-			(response) => {
-				setUserList(
-					userList.map((val) => {
-						return val.id == id
-							? {
-									id: val.id,
-									name: val.name,
-									email: val.email,
-									user: newUser,
-							  }
-							: val;
-					})
-				);
-			}
-		);
-	};
-
-	const deleteUser = (id) => {
-		Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
-			setUserList(
-				userList.filter((val) => {
-					return val.id != id;
-				})
-			);
-		});
-	};
+	const {setData, addUsers, updateUser, deleteUser, addNewUsers, userList} = useDataBase();
 
 	const textFieldProps = {
 		variant: "outlined",
@@ -105,12 +35,14 @@ export default function Main() {
 					<Grid item xs={8} md={4}>
 						{data.map((props) => {
 							return (
+								<Box my = {1}>
 								<TextField
 									label={props.text}
 									name={props.text}
 									{...textFieldProps}
 									onChange={setData}
 								/>
+								</Box>
 							);
 						})}
 						<Box my={1}>
@@ -145,7 +77,7 @@ export default function Main() {
 														size="small"
 														variant="outlined"
 														onChange={(event) => {
-															setNewUser(event.target.value);
+															addNewUsers(event);
 														}}
 													/>
 												</Box>

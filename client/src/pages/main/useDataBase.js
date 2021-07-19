@@ -1,23 +1,28 @@
+//React
 import React, {useState, useEffect} from "react";
+//Database api
 import Axios from "axios";
 
-export default function useDataBase(props) {
+export default function useDataBase() {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [user, setUser] = useState("");
 	const [newUser, setNewUser] = useState("");
 	const [userList, setUserList] = useState([]);
+	
+	//Sets the data of name,email,user in useState
 	const setData = (e) => {
 		if (e.target.name == "Name") setName(e.target.value);
 		else if (e.target.name == "Email") setEmail(e.target.value);
 		else if (e.target.name == "User") setUser(e.target.value);
 	};
-
+	//Adds the user from the useState into the database
 	const addUsers = () => {
-		Axios.post("http://localhost:3001/create", {
+		Axios.post("https://mysql-deploy-crud.herokuapp.com/create", {
 			name: name,
 			email: email,
 			user: user,
+		//Updates userList to display in app
 		}).then(() => {
 			setUserList([
 				...userList,
@@ -29,9 +34,9 @@ export default function useDataBase(props) {
 			]);
 		});
 	};
-
+	//Gets the users from database and set it into userList
 	const getUsers = () => {
-		Axios.get("http://localhost:3001/users").then((response) => {
+		Axios.get("https://mysql-deploy-crud.herokuapp.com/users").then((response) => {
 			setUserList(response.data);
 		});
 	};
@@ -39,9 +44,9 @@ export default function useDataBase(props) {
 	useEffect(() => {
 		getUsers();
 	});
-
+	//Updates the user name, could change to update anything like email
 	const updateUser = (id) => {
-		Axios.put("http://localhost:3001/update", { user: newUser, id: id }).then(
+		Axios.put("https://mysql-deploy-crud.herokuapp.com/update", { user: newUser, id: id }).then(
 			(response) => {
 				setUserList(
 					userList.map((val) => {
@@ -58,9 +63,9 @@ export default function useDataBase(props) {
 			}
 		);
 	};
-
+	//Deletes user from database and updates userList
 	const deleteUser = (id) => {
-		Axios.delete(`http://localhost:3001/delete/${id}`).then((response) => {
+		Axios.delete(`https://mysql-deploy-crud.herokuapp.com/delete/${id}`).then((response) => {
 			setUserList(
 				userList.filter((val) => {
 					return val.id != id;
@@ -68,7 +73,7 @@ export default function useDataBase(props) {
 			);
 		});
 	};
-
+	//Adds the new users
 	const addNewUsers = (event) => {
 		setNewUser(event.target.value);
 	}
